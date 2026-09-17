@@ -1,0 +1,52 @@
+# Guía de colaboración con Git
+
+## Repositorio
+
+https://github.com/tavoics1-stack/M1721_OPEN_PRICES_OFF
+
+Este repositorio contiene la versión final reproducible del proyecto Open Prices y Open Food Facts.
+
+## Organización de ramas
+
+La rama `main` conserva el proyecto final validado. Cada integrante trabaja en su rama:
+
+- `feature/tavoics1-stack`
+- `feature/carlosqnk`
+- `feature/williamat`
+- `feature/wilsonandressani-cyber`
+
+No se deben integrar cambios en `main` sin autorización del responsable del proyecto.
+
+## Cómo empezar
+
+Cada integrante debe aceptar su invitación de GitHub y clonar el repositorio en su computadora:
+
+git clone https://github.com/tavoics1-stack/M1721_OPEN_PRICES_OFF.git
+
+Después debe entrar en la carpeta del proyecto y seleccionar su rama remota. Por ejemplo, Carlos utilizará:
+
+git switch --track origin/feature/carlosqnk
+
+Cada persona debe sustituir ese nombre por el de su propia rama.
+
+## Registrar una contribución
+
+Antes de modificar archivos, comprobar la rama activa con `git status`.
+
+Después de realizar y revisar un cambio:
+
+1. Seleccionar los archivos correspondientes en Source Control.
+2. Escribir un mensaje de commit que describa el cambio realizado.
+3. Crear el commit con la identidad de Git del integrante.
+4. Subir los cambios a su propia rama.
+5. Verificar en GitHub que el commit aparece en esa rama.
+
+No se deben crear commits en nombre de otro integrante.
+
+## Protección del proyecto final
+
+Las contribuciones de esta práctica deben mantenerse separadas de `main`. No modificar los datasets finales, los manifiestos de hashes ni los resultados validados.
+
+Tampoco se deben subir contraseñas, archivos `.env`, imágenes privadas, entornos virtuales ni los materiales experimentales de la V2.
+
+Las ramas individuales permiten demostrar el trabajo realizado sin alterar la entrega principal.
