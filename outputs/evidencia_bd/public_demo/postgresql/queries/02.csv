@@ -1,0 +1,7 @@
+tabla,conname,definicion
+m1721_004.categorias,categorias_pkey,PRIMARY KEY (category_tag)
+m1721_004.precios,precios_pkey,PRIMARY KEY (id)
+m1721_004.productos,productos_pkey,PRIMARY KEY (product_code)
+m1721_004.proofs,proofs_pkey,PRIMARY KEY (proof_id)
+m1721_004.stg_open_prices,stg_open_prices_pkey,PRIMARY KEY (price_id)
+m1721_004.ubicaciones,ubicaciones_pkey,PRIMARY KEY (location_id)

@@ -1,0 +1,16 @@
+{
+  "estado": "PASS",
+  "modo": "LOCAL_FULL",
+  "lecturas": "PostgreSQL staging y documentos MongoDB mediante proyección sanitizada",
+  "fuente_proof_secundaria": "proyección canónica de metadatos archivados; no se atribuye a MongoDB",
+  "filas_antes": 485,
+  "filas_despues_off": 485,
+  "filas_despues_proof": 485,
+  "price_id_antes": 485,
+  "price_id_despues": 485,
+  "columnas": 38,
+  "productos": 79,
+  "igualdad_38_columnas_con_csv_canonico": true,
+  "relacion_entre_motores": "lógica product_code = requested_code = response.product.code; sin FK física entre motores",
+  "nova": "Representación textual decimal de la proyección v1 conservada al comparar el valor NOVA del motor"
+}

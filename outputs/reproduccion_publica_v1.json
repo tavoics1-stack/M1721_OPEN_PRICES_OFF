@@ -1,0 +1,11 @@
+{
+  "estado": "PASS",
+  "bat_exit_code": 0,
+  "directorio": "Copia aislada dentro del proyecto autorizado",
+  "red": "Bloqueada",
+  "inputs": "Solo tres proyecciones incluidas y bibliotecas del entorno",
+  "hashes": {
+    "precios_productos_predictive_preparation_v1.csv": "ddeef932f6660e19f693d422694288655f68144d515d6993550bb57d91427e6c",
+    "precios_productos_predictive_preparation_v1.parquet": "ed3c5be0c37d8e63f7890669afb19a410aaec2aadfc0fd08e54f287b0e47f03a"
+  }
+}

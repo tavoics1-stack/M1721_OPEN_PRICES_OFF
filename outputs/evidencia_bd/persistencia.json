@@ -1,0 +1,61 @@
+{
+  "estado": "PASS",
+  "antes": {
+    "m1721_004": {
+      "postgres": {
+        "filas": "307183",
+        "ids": "307183"
+      },
+      "mongodb": [
+        86,
+        79,
+        7
+      ]
+    },
+    "m1721_public_demo": {
+      "postgres": {
+        "filas": "485",
+        "ids": "485"
+      },
+      "mongodb": [
+        79,
+        79,
+        0
+      ]
+    }
+  },
+  "despues": {
+    "m1721_004": {
+      "postgres": {
+        "filas": "307183",
+        "ids": "307183"
+      },
+      "mongodb": [
+        86,
+        79,
+        7
+      ]
+    },
+    "m1721_public_demo": {
+      "postgres": {
+        "filas": "485",
+        "ids": "485"
+      },
+      "mongodb": [
+        79,
+        79,
+        0
+      ]
+    }
+  },
+  "volumenes_conservados": [
+    "m1721_postgres_data",
+    "m1721_mongodb_data"
+  ],
+  "secuencia": [
+    "stop",
+    "start",
+    "healthy",
+    "conteos iguales"
+  ]
+}

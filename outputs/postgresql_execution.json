@@ -1,0 +1,51 @@
+{
+  "status": "EJECUTADO",
+  "version": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "checks": [
+    {
+      "check": "rows_stg_open_prices",
+      "value": 307183,
+      "status": "PASS"
+    },
+    {
+      "check": "rows_productos",
+      "value": 135700,
+      "status": "PASS"
+    },
+    {
+      "check": "rows_categorias",
+      "value": 593,
+      "status": "PASS"
+    },
+    {
+      "check": "rows_precios",
+      "value": 307183,
+      "status": "PASS"
+    },
+    {
+      "check": "rows_ubicaciones",
+      "value": 6608,
+      "status": "PASS"
+    },
+    {
+      "check": "rows_proofs",
+      "value": 113917,
+      "status": "PASS"
+    },
+    {
+      "check": "view_cardinality",
+      "value": 307183,
+      "status": "PASS"
+    },
+    {
+      "check": "proof_nulls_preserved",
+      "value": 129,
+      "status": "PASS"
+    }
+  ],
+  "documents": null,
+  "queries": 12,
+  "indexes": null,
+  "origen_sha256": "cdc97ea2254f4847059b98c074236f0259cd52fd366659bb5bc3ee173e698258",
+  "alcance": "Evidencia histórica; ningún motor ejecutado en v1"
+}

@@ -1,0 +1,11 @@
+{
+  "estado": "PASS",
+  "kernel": "ipykernel real mediante nbclient",
+  "celdas": 36,
+  "celdas_codigo": 14,
+  "errores": 0,
+  "notebook_sha256": "cfd12b02b834ca6fcb8d139e4e89a3c3e246307a9355af76b998428bd9bfeae1",
+  "html_sha256": "3aca88cf553168a5a8b529d0ad689deebbd5f1baee055ad6b72098a64a2bc83e",
+  "contexto": "Entorno privado autorizado; datos operativos dentro de la copia pública, sin originales excluidos ni red",
+  "html": "Estático, con todas las celdas y salidas; no depende de Jupyter"
+}

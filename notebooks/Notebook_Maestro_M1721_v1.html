@@ -1,0 +1,1717 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notebook M1721 v1</title><style>body{font:16px/1.55 Georgia,serif;color:#222;background:white;margin:0}main{max-width:1120px;margin:auto;padding:32px}h1{font-size:28px}h2{font-size:22px;margin-top:36px}pre{font:13px/1.5 Consolas,monospace;overflow:auto;background:#f5f5f5;padding:14px}table{border-collapse:collapse;font:13px/1.4 Arial,sans-serif}td,th{padding:8px;border:1px solid #ddd;text-align:left!important;min-width:70px;max-width:360px;overflow-wrap:anywhere}.output{overflow:auto;margin:12px 0 22px}.label{font:12px Arial;color:#555}a{color:#333}@media print{main{padding:0}pre{white-space:pre-wrap}}</style></head><body><main><p>Lectura estática del Notebook ejecutado. Muestra código y salidas; no ejecuta análisis en el navegador.</p><section><h1>Dataset integrado de precios y productos para preparación predictiva</h1><p>Grupo 2. M1721, ESPOCH. Versión académica v1. El Notebook histórico permanece intacto. Esta versión trabaja con proyecciones redistribuibles y conserva la diferencia entre reproducción pública y archivo privado.</p></section><section><h2>Problema, finalidad y alcance</h2><p>Los precios, características del producto y evidencias están distribuidos entre fuentes heterogéneas. La finalidad posterior es una regresión del precio. El alcance actual termina en construir y documentar el dataset; no en entrenar o evaluar modelos.</p><p>Construir un dataset integrado, trazable y reproducible a partir de Open Prices y Open Food Facts, que reúna información sobre precios, características de los productos, ubicación y momento del registro, y que quede preparado como base para el posterior desarrollo de modelos predictivos del precio de productos alimenticios.</p></section><section class="cell"><p class="label">Celda 1</p><pre><code>from pathlib import Path
+import sys, json, hashlib
+import pandas as pd
+from IPython.display import display
+ROOT = Path.cwd()
+if not (ROOT / &#x27;data/manifests/version_v1.json&#x27;).is_file():
+    ROOT = ROOT.parent
+assert (ROOT / &#x27;data/manifests/version_v1.json&#x27;).is_file(), &#x27;Ejecutar desde la raíz o notebooks/&#x27;
+sys.path.insert(0, str(ROOT / &#x27;src&#x27;))
+import reproducir as pipeline
+pipeline.block_network()
+version = json.loads((ROOT / &#x27;data/manifests/version_v1.json&#x27;).read_text(encoding=&#x27;utf-8&#x27;))
+display(pd.DataFrame([{&#x27;Python&#x27;:sys.version.split()[0], &#x27;pandas&#x27;:pd.__version__, &#x27;modo&#x27;:&#x27;OFFLINE_DESDE_PROYECCIONES&#x27;}]))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Python</th>
+      <th>pandas</th>
+      <th>modo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.12.14</td>
+      <td>3.0.1</td>
+      <td>OFFLINE_DESDE_PROYECCIONES</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Fuentes, adquisición, formatos y metadatos</h2><p>El archivo privado conserva el Parquet OP fijado, 86 respuestas OFF completas y 83 metadatos de proofs. Se verificaron sus hashes antes de proyectar. No se adquirieron nuevas fuentes. La copia pública contiene proyecciones CSV y el resultado CSV/Parquet; no los originales crudos.</p><p>El manifiesto permite identificar fuente, adquisición, revisión y hash. No debe confundirse la fecha de adquisición con la fecha del precio.</p></section><section class="cell"><p class="label">Celda 2</p><pre><code>sources = pd.read_csv(ROOT/&#x27;data/manifests/fuentes_v1.csv&#x27;, dtype=&#x27;string&#x27;)
+display(sources[[&#x27;ruta_original&#x27;,&#x27;adquirido_utc&#x27;,&#x27;snapshot&#x27;,&#x27;sha256&#x27;]].head(6))
+display(pd.DataFrame([{&#x27;originales_identificados&#x27;:len(sources),&#x27;verificacion_original_publica&#x27;:&#x27;No: originales excluidos por privacidad&#x27;}]))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ruta_original</th>
+      <th>adquirido_utc</th>
+      <th>snapshot</th>
+      <th>sha256</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>data/source_archive/open_food_facts/00204682.json</td>
+      <td>2026-09-06T22:55:16.858176+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>c64b3fc5e4c20ce3b513d48a0f725676c218dd586bcb90...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>data/source_archive/open_food_facts/0021130306...</td>
+      <td>2026-09-06T22:55:22.090295+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>029e122e3be26b29601c3487f8bb4600690da9766b096e...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>data/source_archive/open_food_facts/0021130494...</td>
+      <td>2026-09-06T22:55:27.278151+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>86e7f3a3babcfb308826d3e0ec333046f5adc347ac8312...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>data/source_archive/open_food_facts/0021500042...</td>
+      <td>2026-09-06T22:55:32.644208+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>ebbae8c996be59f3d148b94f0d6212e5302a8331f89131...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>data/source_archive/open_food_facts/0034500420...</td>
+      <td>2026-09-06T22:55:37.827808+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>9ff48e577c797b812aa10774c39d0afb3747737e32375d...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>data/source_archive/open_food_facts/0048500205...</td>
+      <td>2026-09-06T22:55:43.031158+00:00</td>
+      <td>&lt;NA&gt;</td>
+      <td>dd7c81fdc1297c5639c630a74444ec2ddd2ea16c4cd28a...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>originales_identificados</th>
+      <th>verificacion_original_publica</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>170</td>
+      <td>No: originales excluidos por privacidad</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><p>Los hashes identifican archivos; no prueban exactitud del contenido ni disponibilidad histórica del atributo. Los originales fueron preservados antes de transformar. La construcción privada produjo proyecciones explícitas y no se presenta esa selección como adquisición original pública.</p></section><section><h2>Arquitectura SQL, NoSQL y archivos</h2><p>Open Prices es el núcleo estructurado. PostgreSQL organiza productos, categorías, precios, ubicaciones y proofs mediante claves. MongoDB conserva fichas OFF como documentos completos con objetos y listas. Los proofs son entidades de evidencia; no todos son fotografías. Las imágenes seleccionadas permanecen privadas. Python hace la integración, no un JOIN entre motores.</p></section><section class="cell"><p class="label">Celda 3</p><pre><code>pg = json.loads((ROOT/&#x27;outputs/postgresql_execution.json&#x27;).read_text(encoding=&#x27;utf-8&#x27;))
+mongo = json.loads((ROOT/&#x27;outputs/mongodb_execution.json&#x27;).read_text(encoding=&#x27;utf-8&#x27;))
+display(pd.DataFrame(pg[&#x27;checks&#x27;]))
+display(pd.DataFrame([{&#x27;motor&#x27;:&#x27;MongoDB&#x27;,&#x27;version&#x27;:mongo[&#x27;version&#x27;],&#x27;documentos&#x27;:mongo[&#x27;documents&#x27;],&#x27;consultas&#x27;:mongo[&#x27;queries&#x27;],&#x27;indices&#x27;:len(mongo[&#x27;indexes&#x27;])}]))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>check</th>
+      <th>value</th>
+      <th>status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>rows_stg_open_prices</td>
+      <td>307183</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>rows_productos</td>
+      <td>135700</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>rows_categorias</td>
+      <td>593</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>rows_precios</td>
+      <td>307183</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>rows_ubicaciones</td>
+      <td>6608</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>rows_proofs</td>
+      <td>113917</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>view_cardinality</td>
+      <td>307183</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>proof_nulls_preserved</td>
+      <td>129</td>
+      <td>PASS</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>motor</th>
+      <th>version</th>
+      <th>documentos</th>
+      <th>consultas</th>
+      <th>indices</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MongoDB</td>
+      <td>8.0.29</td>
+      <td>86</td>
+      <td>8</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><p>Estos resultados son evidencia histórica de ejecución, no consultas actuales. PostgreSQL verificó una vista de 307.183 observaciones y MongoDB conservó 86 respuestas. Los scripts SQL y recursos MongoDB se incluyen para explicar el diseño histórico; requieren insumos privados y no se ejecutan aquí.</p></section><section><h2>Integración y cardinalidades</h2><p>En la ejecución privada se seleccionaron del core todas las observaciones PRODUCT cuyo código coincide exactamente con una ficha OFF válida. No se filtró por moneda, ciudad, nutrición o proof. Aquí reconstruimos la integración desde esas proyecciones, comprobando unicidad de cada clave antes de unir.</p></section><section class="cell"><p class="label">Celda 4</p><pre><code>core = pd.read_csv(ROOT/&#x27;data/inputs/core_enriquecible_v1.csv&#x27;, dtype=&#x27;string&#x27;)
+off = pd.read_csv(ROOT/&#x27;data/inputs/off_proyeccion_v1.csv&#x27;, dtype=&#x27;string&#x27;)
+proof = pd.read_csv(ROOT/&#x27;data/inputs/proofs_proyeccion_v1.csv&#x27;, dtype=&#x27;string&#x27;)
+assert core.price_id.is_unique and off.product_code.is_unique and proof.proof_id.is_unique
+a = core.merge(off, on=&#x27;product_code&#x27;, how=&#x27;left&#x27;, validate=&#x27;many_to_one&#x27;)
+b = a.merge(proof, on=&#x27;proof_id&#x27;, how=&#x27;left&#x27;, validate=&#x27;many_to_one&#x27;)
+assert len(core) == len(a) == len(b) and b.price_id.is_unique
+display(pd.DataFrame({&#x27;etapa&#x27;:[&#x27;selección core&#x27;,&#x27;unión OFF&#x27;,&#x27;unión proof&#x27;],&#x27;filas&#x27;:[len(core),len(a),len(b)]}))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>etapa</th>
+      <th>filas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>selección core</td>
+      <td>485</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>unión OFF</td>
+      <td>485</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>unión proof</td>
+      <td>485</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><p>Las uniones conservan 485 observaciones. La ausencia de metadatos secundarios no multiplica ni elimina precios. Los siete productos OFF no encontrados y las observaciones CATEGORY permanecen en los datasets históricos; el nuevo alcance exige una ficha válida, no modifica esos históricos.</p></section><section class="cell"><p class="label">Celda 5</p><pre><code>d = pipeline.build(ROOT)
+assert d.price_id.is_unique and d.price_type.eq(&#x27;PRODUCT&#x27;).all()
+display(d[[&#x27;price_id&#x27;,&#x27;product_code&#x27;,&#x27;price&#x27;,&#x27;currency&#x27;,&#x27;date&#x27;,&#x27;country&#x27;,&#x27;city&#x27;,&#x27;product_name&#x27;]].head(8))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price_id</th>
+      <th>product_code</th>
+      <th>price</th>
+      <th>currency</th>
+      <th>date</th>
+      <th>country</th>
+      <th>city</th>
+      <th>product_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>355</td>
+      <td>3423182102411</td>
+      <td>4.150</td>
+      <td>EUR</td>
+      <td>2023-11-27</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>pur jus pomme framboise bio</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>655</td>
+      <td>3760020507916</td>
+      <td>3.070</td>
+      <td>EUR</td>
+      <td>2023-11-27</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Gaufrettes chocolat</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>999</td>
+      <td>3443431503004</td>
+      <td>6.350</td>
+      <td>EUR</td>
+      <td>2023-12-18</td>
+      <td>France</td>
+      <td>Paris</td>
+      <td>Poudre de cacao maigre biologique</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1000</td>
+      <td>3456300014556</td>
+      <td>2.850</td>
+      <td>EUR</td>
+      <td>2023-12-19</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Fourrés Chocolat🍫</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1001</td>
+      <td>3760020507916</td>
+      <td>3.160</td>
+      <td>EUR</td>
+      <td>2023-12-19</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Gaufrettes chocolat</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1096</td>
+      <td>3456300014556</td>
+      <td>2.620</td>
+      <td>EUR</td>
+      <td>2023-12-24</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Fourrés Chocolat🍫</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1108</td>
+      <td>3456300014556</td>
+      <td>2.850</td>
+      <td>EUR</td>
+      <td>2023-12-24</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Fourrés Chocolat🍫</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1109</td>
+      <td>3760020507916</td>
+      <td>3.160</td>
+      <td>EUR</td>
+      <td>2023-12-24</td>
+      <td>France</td>
+      <td>Grenoble</td>
+      <td>Gaufrettes chocolat</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Resultado final del proyecto</h2><p>El resultado nuevo es precios_productos_predictive_preparation_v1. El core conserva el snapshot completo; el multifuente histórico demuestra integración; v1 materializa todas las filas actualmente enriquecibles con OFF archivado y deriva componentes temporales. Ninguno se presenta como prueba de suficiencia predictiva.</p></section><section class="cell"><p class="label">Celda 6</p><pre><code>display(pd.DataFrame([
+    {&#x27;dataset&#x27;:&#x27;open_prices_core_curated&#x27;,&#x27;filas&#x27;:307183,&#x27;columnas&#x27;:24,&#x27;rol&#x27;:&#x27;Histórico completo, privado e intacto&#x27;},
+    {&#x27;dataset&#x27;:&#x27;precios_productos_multifuente_curated&#x27;,&#x27;filas&#x27;:100,&#x27;columnas&#x27;:36,&#x27;rol&#x27;:&#x27;Demostración histórica, privada e intacta&#x27;},
+    {&#x27;dataset&#x27;:pipeline.NAME,&#x27;filas&#x27;:len(d),&#x27;columnas&#x27;:len(d.columns),&#x27;rol&#x27;:&#x27;Preparación v1 incluida&#x27;}]))
+display(pd.DataFrame({&#x27;variable&#x27;:d.columns,&#x27;presentes&#x27;:d.notna().sum().values,&#x27;tipo&#x27;:d.dtypes.astype(str).values}))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dataset</th>
+      <th>filas</th>
+      <th>columnas</th>
+      <th>rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>open_prices_core_curated</td>
+      <td>307183</td>
+      <td>24</td>
+      <td>Histórico completo, privado e intacto</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>precios_productos_multifuente_curated</td>
+      <td>100</td>
+      <td>36</td>
+      <td>Demostración histórica, privada e intacta</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>precios_productos_predictive_preparation_v1</td>
+      <td>485</td>
+      <td>38</td>
+      <td>Preparación v1 incluida</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>variable</th>
+      <th>presentes</th>
+      <th>tipo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>price_id</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>price_type</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>product_code</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>category_tag</td>
+      <td>0</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>price</td>
+      <td>485</td>
+      <td>object</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>price_per</td>
+      <td>0</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>currency</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>date</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>location_id</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>proof_id</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>proof_type</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>country</td>
+      <td>484</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>city</td>
+      <td>479</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>qc_price_positive</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>qc_currency_present</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>qc_date_present</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>qc_date_not_future</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>qc_date_valid</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>qc_proof_present</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>qc_proof_visual</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>qc_product_identity</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>qc_core_eligible</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>product_name</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>brands</td>
+      <td>481</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>categories_tags</td>
+      <td>483</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>nutriscore_grade</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>nova_group</td>
+      <td>475</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>off_source_sha256</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>off_acquired_at</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>off_last_modified_t</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>off_history_status</td>
+      <td>485</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>proof_metadata_sha256</td>
+      <td>75</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>proof_metadata_type</td>
+      <td>75</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>proof_prediction_count</td>
+      <td>75</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>year</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>month</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>day_of_week</td>
+      <td>485</td>
+      <td>Int64</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>proof_metadata_available</td>
+      <td>485</td>
+      <td>boolean</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Calidad, faltantes y evidencia</h2><p>Los flags históricos se conservan sin modificar su definición. qc_core_eligible incluye proof y depende del precio: no es una regla automática para seleccionar datos predictivos. Los nulos de metadatos indican información no archivada, no ausencia de evidencia en origen.</p></section><section class="cell"><p class="label">Celda 7</p><pre><code>display(pd.DataFrame([{&#x27;flag&#x27;:c,&#x27;false&#x27;:int((~d[c]).sum())} for c in d if c.startswith(&#x27;qc_&#x27;)]))
+display(pd.DataFrame([{&#x27;metadatos_proof_presentes&#x27;:int(d.proof_metadata_available.sum()),&#x27;sin_metadatos_archivados&#x27;:int((~d.proof_metadata_available).sum()),&#x27;filas_conservadas&#x27;:len(d)}]))
+display(d.nutriscore_grade.value_counts(dropna=False).rename_axis(&#x27;estado&#x27;).to_frame(&#x27;filas&#x27;))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>flag</th>
+      <th>false</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>qc_price_positive</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>qc_currency_present</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>qc_date_present</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>qc_date_not_future</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>qc_date_valid</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>qc_proof_present</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>qc_proof_visual</td>
+      <td>410</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>qc_product_identity</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>qc_core_eligible</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metadatos_proof_presentes</th>
+      <th>sin_metadatos_archivados</th>
+      <th>filas_conservadas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>75</td>
+      <td>410</td>
+      <td>485</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filas</th>
+    </tr>
+    <tr>
+      <th>estado</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>d</th>
+      <td>152</td>
+    </tr>
+    <tr>
+      <th>c</th>
+      <td>103</td>
+    </tr>
+    <tr>
+      <th>e</th>
+      <td>94</td>
+    </tr>
+    <tr>
+      <th>a</th>
+      <td>54</td>
+    </tr>
+    <tr>
+      <th>unknown</th>
+      <td>52</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>29</td>
+    </tr>
+    <tr>
+      <th>not-applicable</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><p>Las 410 filas sin metadatos archivados permanecen. Un estado unknown o not-applicable de Nutri-Score no es un grado a-e. No se imputaron faltantes ni se eliminaron observaciones secundariamente.</p></section><section><h2>Preparación del dataset para una futura predicción de precios</h2><p>price sería el objetivo potencial. Marca, categorías OFF, atributos seleccionables de producto, lugar y fecha son candidatos condicionados. Los identificadores se conservan para trazabilidad y no se tratan como números continuos. La matriz diferencia candidatos, descriptores, identificadores, riesgos de leakage y variables que necesitan preparación.</p></section><section class="cell"><p class="label">Celda 8</p><pre><code>matrix = pd.read_csv(ROOT/&#x27;docs/MATRIZ_VARIABLES_PARA_FUTURO_MODELADO.csv&#x27;)
+display(matrix[[&#x27;VARIABLE&#x27;,&#x27;COBERTURA&#x27;,&#x27;CLASIFICACION&#x27;,&#x27;PREPARACION_NECESARIA&#x27;]])</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>VARIABLE</th>
+      <th>COBERTURA</th>
+      <th>CLASIFICACION</th>
+      <th>PREPARACION_NECESARIA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>price_id</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>No codificar como magnitud</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>price_type</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Separar PRODUCT de CATEGORY</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>product_code</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Conservar ceros; no tratar como número continuo</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>category_tag</td>
+      <td>0/485 filas</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>No sustituir categories_tags OFF</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>price</td>
+      <td>485/485 filas</td>
+      <td>OBJETIVO_POTENCIAL</td>
+      <td>Delimitar moneda, cantidad y envase</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>price_per</td>
+      <td>0/485 filas</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>No imputar unidad; ausente en PRODUCT</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>currency</td>
+      <td>485/485 filas</td>
+      <td>A_CANDIDATO_CON_RESTRICCION</td>
+      <td>Una moneda o estrategia posterior justificada</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>date</td>
+      <td>485/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Conservar original y validar formato</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>location_id</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>No magnitud continua; prever lugares nuevos</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>proof_id</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>proof_type</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>country</td>
+      <td>484/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Normalizar etiquetas; no geocodificar ni imputar</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>city</td>
+      <td>479/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Normalizar con país; tratar faltantes</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>qc_price_positive</td>
+      <td>485/485 filas</td>
+      <td>D_POSIBLE_LEAKAGE</td>
+      <td>No convertir qc_core_eligible en regla de mode...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>qc_currency_present</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>qc_date_present</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>qc_date_not_future</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>qc_date_valid</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>qc_proof_present</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>qc_proof_visual</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>qc_product_identity</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>Conservar flag; definir política específica de...</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>qc_core_eligible</td>
+      <td>485/485 filas</td>
+      <td>D_POSIBLE_LEAKAGE</td>
+      <td>No convertir qc_core_eligible en regla de mode...</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>product_name</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>No codificar texto automáticamente</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>brands</td>
+      <td>481/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Normalizar listas, duplicados y faltantes</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>categories_tags</td>
+      <td>483/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Parsear lista; definir codificación posterior</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>nutriscore_grade</td>
+      <td>485/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Separar unknown/not-applicable de grados válidos</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>nova_group</td>
+      <td>475/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Validar dominio 1-4; representar como categoría</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>off_source_sha256</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Excluir de predictores</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>off_acquired_at</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Metadato UTC, no fecha del precio</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>off_last_modified_t</td>
+      <td>485/485 filas</td>
+      <td>D_POSIBLE_LEAKAGE</td>
+      <td>Convertir UTC solo para auditoría; no predictor</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>off_history_status</td>
+      <td>485/485 filas</td>
+      <td>C_DESCRIPTIVA</td>
+      <td>No usar como predictor; constante</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>proof_metadata_sha256</td>
+      <td>75/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>proof_metadata_type</td>
+      <td>75/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>proof_prediction_count</td>
+      <td>75/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>year</td>
+      <td>485/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Entero; derivación sin consultar futuro</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>month</td>
+      <td>485/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Categoría temporal; codificación posterior</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>day_of_week</td>
+      <td>485/485 filas</td>
+      <td>A_PREDICTOR_CANDIDATO</td>
+      <td>Categoría temporal; codificación posterior</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>proof_metadata_available</td>
+      <td>485/485 filas</td>
+      <td>B_IDENTIFICADOR_LINAJE</td>
+      <td>Nulo es no consultado; False no implica inexis...</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>ingredients_text</td>
+      <td>Disponible en archivo privado; no proyectada</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>Texto libre: preparación semántica y privacida...</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>nutrition</td>
+      <td>77/79 productos con objeto nutrition</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>No proyectada: validar per, preparation, sourc...</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>quantity/product_quantity</td>
+      <td>Disponible parcialmente en archivo privado; no...</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>No garantiza equivalencia histórica de envase ...</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>coordenadas/tienda</td>
+      <td>No incluidas en v1</td>
+      <td>E_REQUIERE_PREPARACION</td>
+      <td>No inventadas; location_id no equivale a nombr...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Variables temporales y disponibilidad histórica</h2><p>year, month y day_of_week derivan solo de date; lunes es 0. No se añadió quarter redundante. Los metadatos de captura OFF son distintos de la fecha del precio. Marca e identidad relativamente estables siguen sin certificación histórica; categorías, ingredientes, nutrición y clasificaciones pueden cambiar.</p></section><section class="cell"><p class="label">Celda 9</p><pre><code>dates = pd.to_datetime(d.date)
+assert d.year.eq(dates.dt.year).all()
+assert d.month.eq(dates.dt.month).all()
+assert d.day_of_week.eq(dates.dt.dayofweek).all()
+display(d[[&#x27;date&#x27;,&#x27;year&#x27;,&#x27;month&#x27;,&#x27;day_of_week&#x27;,&#x27;off_acquired_at&#x27;,&#x27;off_history_status&#x27;]].head())</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day_of_week</th>
+      <th>off_acquired_at</th>
+      <th>off_history_status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2023-11-27</td>
+      <td>2023</td>
+      <td>11</td>
+      <td>0</td>
+      <td>2026-09-06T22:58:21.457654+00:00</td>
+      <td>NO_VERIFICABLE_HISTORICAMENTE</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2023-11-27</td>
+      <td>2023</td>
+      <td>11</td>
+      <td>0</td>
+      <td>2026-09-05T19:36:23.581606+00:00</td>
+      <td>NO_VERIFICABLE_HISTORICAMENTE</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2023-12-18</td>
+      <td>2023</td>
+      <td>12</td>
+      <td>0</td>
+      <td>2026-09-06T22:58:26.582736+00:00</td>
+      <td>NO_VERIFICABLE_HISTORICAMENTE</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2023-12-19</td>
+      <td>2023</td>
+      <td>12</td>
+      <td>1</td>
+      <td>2026-09-06T22:58:37.175429+00:00</td>
+      <td>NO_VERIFICABLE_HISTORICAMENTE</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2023-12-19</td>
+      <td>2023</td>
+      <td>12</td>
+      <td>1</td>
+      <td>2026-09-05T19:36:23.581606+00:00</td>
+      <td>NO_VERIFICABLE_HISTORICAMENTE</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Moneda, ubicación y comparabilidad</h2><p>Se conserva currency. Una futura tarea deberá trabajar dentro de una moneda o justificar otra estrategia posteriormente. No hubo conversión. price_per está ausente en PRODUCT; falta resolver cantidad/envase. location_id es categórico; país y ciudad no representan coordenadas ni una tienda identificada por nombre.</p></section><section class="cell"><p class="label">Celda 10</p><pre><code>display(d.groupby(&#x27;currency&#x27;).agg(filas=(&#x27;price_id&#x27;,&#x27;size&#x27;),productos=(&#x27;product_code&#x27;,&#x27;nunique&#x27;)))
+display(pd.DataFrame([{&#x27;price_per_presentes&#x27;:int(d.price_per.notna().sum()),&#x27;paises&#x27;:d.country.nunique(),&#x27;ubicaciones&#x27;:d.location_id.nunique(),&#x27;pais_nulo&#x27;:int(d.country.isna().sum()),&#x27;ciudad_nula&#x27;:int(d.city.isna().sum())}]))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filas</th>
+      <th>productos</th>
+    </tr>
+    <tr>
+      <th>currency</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ADP</th>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>AED</th>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>AFN</th>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>AMD</th>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>ARS</th>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>EUR</th>
+      <td>449</td>
+      <td>66</td>
+    </tr>
+    <tr>
+      <th>GBP</th>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>INR</th>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>THB</th>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>USD</th>
+      <td>23</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price_per_presentes</th>
+      <th>paises</th>
+      <th>ubicaciones</th>
+      <th>pais_nulo</th>
+      <th>ciudad_nula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>14</td>
+      <td>148</td>
+      <td>1</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Información nutricional</h2><p>Se revisaron 79 fichas: 77 contienen nutrition. La estructura distingue bases y preparación e incluye valores calculados. No se añadieron nutrientes numéricos, ingredientes libres ni tamaños de envase en v1. Esto evita afirmar comparabilidad que no se ha verificado; su presencia archivada queda documentada para un estudio posterior.</p></section><section class="cell"><p class="label">Celda 11</p><pre><code>nutrition = pd.read_csv(ROOT/&#x27;outputs/nutricion_cobertura_v1.csv&#x27;, dtype={&#x27;product_code&#x27;:&#x27;string&#x27;})
+display(nutrition.groupby([&#x27;per&#x27;,&#x27;preparation&#x27;],dropna=False).size().to_frame(&#x27;productos&#x27;))
+display(nutrition.filter(regex=&#x27;presente$&#x27;).sum().to_frame(&#x27;productos_con_campo&#x27;))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>productos</th>
+    </tr>
+    <tr>
+      <th>per</th>
+      <th>preparation</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>100g</th>
+      <th>as_sold</th>
+      <td>73</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">100ml</th>
+      <th>as_sold</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>prepared</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>NaN</th>
+      <th>NaN</th>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>productos_con_campo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>nutrition_presente</th>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>energy-kcal_presente</th>
+      <td>76</td>
+    </tr>
+    <tr>
+      <th>fat_presente</th>
+      <td>75</td>
+    </tr>
+    <tr>
+      <th>sugars_presente</th>
+      <td>75</td>
+    </tr>
+    <tr>
+      <th>proteins_presente</th>
+      <td>75</td>
+    </tr>
+    <tr>
+      <th>salt_presente</th>
+      <td>75</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Leakage y decisiones de validación futura</h2><p>Se excluyen de predictores price_id, hashes, rutas, flags derivados del precio y contenido de proofs que incorpore el objetivo. No se calculan medias de precio ni agregaciones con observaciones futuras. OFF no acredita disponibilidad histórica de sus atributos.</p><p>Un estudio posterior deberá considerar dependencia por producto, ubicación, fecha y proof, así como productos o lugares nuevos. No se supone que un split aleatorio sea válido. Aquí no se divide el dataset ni se entrena un modelo.</p></section><section><h2>Exploración descriptiva conservada</h2><p>Se mantiene el ejemplo de Gaufrettes chocolat, código 3760020507916, en EUR. Su función es comprobar que los datos permiten una consulta interpretable, no presentar la descripción como objetivo final. Se comparan importes del mismo código y moneda sin afirmar equivalencia histórica de envase.</p></section><section class="cell"><p class="label">Celda 12</p><pre><code>example = d[d.product_code.eq(&#x27;3760020507916&#x27;) &amp; d.currency.eq(&#x27;EUR&#x27;) &amp; d.qc_price_positive &amp; d.qc_date_valid].copy()
+assert len(example) == 32
+display(pd.DataFrame([{&#x27;observaciones&#x27;:len(example),&#x27;fechas&#x27;:example.date.nunique(),&#x27;ubicaciones&#x27;:example.location_id.nunique(),&#x27;min_EUR&#x27;:example.price.min(),&#x27;max_EUR&#x27;:example.price.max(),&#x27;rango_EUR&#x27;:example.price.max()-example.price.min()}]))
+display(example[[&#x27;price_id&#x27;,&#x27;date&#x27;,&#x27;location_id&#x27;,&#x27;price&#x27;]].sort_values([&#x27;date&#x27;,&#x27;price_id&#x27;]).head(8))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>observaciones</th>
+      <th>fechas</th>
+      <th>ubicaciones</th>
+      <th>min_EUR</th>
+      <th>max_EUR</th>
+      <th>rango_EUR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>32</td>
+      <td>27</td>
+      <td>12</td>
+      <td>2.150</td>
+      <td>3.570</td>
+      <td>1.420</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price_id</th>
+      <th>date</th>
+      <th>location_id</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>44</th>
+      <td>12494</td>
+      <td>2023-10-09</td>
+      <td>14</td>
+      <td>2.820</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>12495</td>
+      <td>2023-10-09</td>
+      <td>14</td>
+      <td>2.820</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>12496</td>
+      <td>2023-10-09</td>
+      <td>14</td>
+      <td>2.820</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>655</td>
+      <td>2023-11-27</td>
+      <td>1</td>
+      <td>3.070</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1001</td>
+      <td>2023-12-19</td>
+      <td>3</td>
+      <td>3.160</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1109</td>
+      <td>2023-12-24</td>
+      <td>3</td>
+      <td>3.160</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1124</td>
+      <td>2023-12-24</td>
+      <td>12</td>
+      <td>3.150</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1143</td>
+      <td>2023-12-26</td>
+      <td>14</td>
+      <td>2.820</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><p>El rango observado describe estos registros. No demuestra causas, inflación ni rendimiento predictivo. Las observaciones de un mismo producto no son necesariamente independientes.</p></section><section><h2>Trazabilidad y hashes</h2><p>Cada observación enlaza con el hash del core histórico, su ficha OFF y, cuando existe, los metadatos archivados del proof. Las imágenes siguen fuera de esta carpeta por privacidad. Los hashes históricos se verificaron privadamente y aquí solo se identifican.</p></section><section class="cell"><p class="label">Celda 13</p><pre><code>lineage = pd.read_csv(ROOT/&#x27;data/manifests/linaje_filas_v1.csv&#x27;, dtype=&#x27;string&#x27;)
+assert len(lineage) == len(d) and lineage.price_id.is_unique
+display(lineage[lineage.price_id.eq(&#x27;42629&#x27;)])
+display(pd.DataFrame(list(version[&#x27;outputs_sha256&#x27;].items()),columns=[&#x27;archivo_v1&#x27;,&#x27;sha256&#x27;]))</code></pre><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price_id</th>
+      <th>product_code</th>
+      <th>off_source_sha256</th>
+      <th>proof_id</th>
+      <th>proof_metadata_sha256</th>
+      <th>core_source_sha256</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>108</th>
+      <td>42629</td>
+      <td>3560070283484</td>
+      <td>24fd7006bec7ae662e98251226eb42439e6c7802223600...</td>
+      <td>12176</td>
+      <td>0348b89a3735c597bc339ed3fbdb491f81af48d53a56cc...</td>
+      <td>810cdd8a91f2858188f8b870b13949b83af65bd19b657f...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>archivo_v1</th>
+      <th>sha256</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>precios_productos_predictive_preparation_v1.csv</td>
+      <td>ddeef932f6660e19f693d422694288655f68144d515d69...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>precios_productos_predictive_preparation_v1.pa...</td>
+      <td>ed3c5be0c37d8e63f7890669afb19a410aaec2aadfc0fd...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></section><section><h2>Reproducción pública y privada</h2><p>La reconstrucción siguiente escribe temporales reales CSV/Parquet, verifica equivalencia y compara hashes. No usa Internet ni motores. Empieza en proyecciones públicas: no se confunde con la selección privada desde el core ni con la verificación original de 259 archivos del Notebook histórico.</p></section><section class="cell"><p class="label">Celda 14</p><pre><code>result = pipeline.reproduce(ROOT)
+assert result[&#x27;estado&#x27;] == &#x27;PASS&#x27;
+display(result)</code></pre><div class="output"><pre>{&#x27;estado&#x27;: &#x27;PASS&#x27;,
+ &#x27;modo&#x27;: &#x27;OFFLINE_DESDE_PROYECCIONES&#x27;,
+ &#x27;shape&#x27;: [485, 38],
+ &#x27;price_id_unicos&#x27;: 485,
+ &#x27;hashes&#x27;: {&#x27;precios_productos_predictive_preparation_v1.csv&#x27;: &#x27;ddeef932f6660e19f693d422694288655f68144d515d6993550bb57d91427e6c&#x27;,
+  &#x27;precios_productos_predictive_preparation_v1.parquet&#x27;: &#x27;ed3c5be0c37d8e63f7890669afb19a410aaec2aadfc0fd08e54f287b0e47f03a&#x27;},
+ &#x27;alcance&#x27;: &#x27;Reconstruye v1 desde proyecciones incluidas; no verifica originales privados excluidos.&#x27;}</pre></div></section><section><h2>Limitaciones y conclusiones</h2><p>Se obtuvo una estructura integrada de 485 observaciones y 38 variables, con linaje, derivaciones temporales y roles de variables. Los históricos se preservaron. Las 79 fichas disponibles condicionan la selección; el tamaño, la heterogeneidad monetaria, los faltantes y la falta de versiones históricas impiden prometer una modelización seria sin trabajo adicional.</p><p>Este proyecto construye y documenta el conjunto de datos necesario para una futura tarea de predicción de precios; el entrenamiento y evaluación del modelo quedan fuera del alcance de esta entrega.</p><p>No se usaron modelos, splits, nuevas descargas, OCR ni Spark. El benchmark histórico indicaba que el volumen cabía en memoria; no se repitió. Las bases cuentan con evidencia histórica, no una ejecución nueva en este notebook. La publicación sigue pendiente de autorización.</p></section><section><h2>Referencias</h2><p><a href="https://openfoodfacts.github.io/open-prices/guides/data/">Open Prices</a>, <a href="https://openfoodfacts.github.io/openfoodfacts-server/api/">Open Food Facts API</a> y <a href="https://world.openfoodfacts.org/terms-of-use">términos OFF</a>. Los manifiestos identifican URLs, hashes y fechas de las fuentes previamente archivadas. Se conserva atribución a Open Prices, Open Food Facts y sus contribuyentes. No se consultaron nuevas fuentes en esta versión.</p></section></main></body></html>

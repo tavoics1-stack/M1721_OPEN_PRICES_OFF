@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+*.key
+*.pem
+.ipynb_checkpoints/
+.cache/
+outputs/reproduccion_*/
+outputs/nueva_ejecucion/
+privado/
+source_archive/
+*.zip
+*.exe
+*.dll
+*.log

@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "dataset": "precios_productos_predictive_preparation_v1",
+  "shape": [
+    485,
+    38
+  ],
+  "unidad": "Una observación de precio = price_id",
+  "historicos_sha256": {
+    "open_prices_core_curated.csv": "c70fec8a0d1669cf8f2f2a2d2219016b97e328d4bcc2afcc5247b956379701e0",
+    "open_prices_core_curated.parquet": "810cdd8a91f2858188f8b870b13949b83af65bd19b657f62a6e9386976e4d816",
+    "precios_productos_multifuente_curated.csv": "92366a155acfecee83c7d4e9060a7b363bfb7196386d303bc15e6387eb30e5be",
+    "precios_productos_multifuente_curated.parquet": "828314cd4047a962cebea914e8a7fdfa216012098d54c18538b429dbc123e653"
+  },
+  "inputs_sha256": {
+    "data/inputs/core_enriquecible_v1.csv": "2b8fc70495f25251adcf4bc117dcf8731b0de3c83ccf5e1aa9efc275882b05fd",
+    "data/inputs/off_proyeccion_v1.csv": "5e67756e691171dc3a6b8b3afe5fb83c49847a7f6ed25b628eaa267dfa9e2232",
+    "data/inputs/proofs_proyeccion_v1.csv": "341b28983a4ea55f2f34675b2f5c9dc78f5f13792057a4b38cff8cff0e4001f0"
+  },
+  "outputs_sha256": {
+    "precios_productos_predictive_preparation_v1.csv": "ddeef932f6660e19f693d422694288655f68144d515d6993550bb57d91427e6c",
+    "precios_productos_predictive_preparation_v1.parquet": "ed3c5be0c37d8e63f7890669afb19a410aaec2aadfc0fd08e54f287b0e47f03a"
+  },
+  "core_origen_sha256": "810cdd8a91f2858188f8b870b13949b83af65bd19b657f62a6e9386976e4d816",
+  "pipeline_sha256": "0edceab91e30e71ac22ec9ee736fed6d12e9a04ca9791e0b23771192403f612c",
+  "seleccion": "Todas las filas PRODUCT del core con código exacto OFF encontrado y válido; sin filtro por QC, moneda ni proof",
+  "nutricion": "Disponible en archivo privado; no proyectada hasta validar semántica, unidades y valores calculados",
+  "reproducibilidad_publica": "Desde tres proyecciones incluidas; originales privados no redistribuidos",
+  "extraccion_privada_sha256": "550500b5aee2257da42e48067a56cbc79afcd561b445a8cd0053626ae57af573",
+  "extraccion_privada_referencia": "outputs/reorientacion_v1/build_private.py (archivo privado autorizado)"
+}

@@ -1,0 +1,56 @@
+{
+  "database": "m1721_004",
+  "collection": "off_product_snapshots",
+  "tipo_documento": "Respuesta completa privada",
+  "rutas_permitidas": {
+    "requested_code": "campo observado en documentos del motor",
+    "found": "campo observado en documentos del motor",
+    "source_sha256": "campo observado en documentos del motor",
+    "acquired_at": "campo observado en documentos del motor",
+    "response.product.code": "campo observado en documentos del motor",
+    "response.product.product_name": "campo observado en documentos del motor",
+    "response.product.brands": "campo observado en documentos del motor",
+    "response.product.categories_tags": "campo observado en documentos del motor",
+    "response.product.nutriscore_grade": "campo observado en documentos del motor",
+    "response.product.nova_group": "campo observado en documentos del motor",
+    "response.product.last_modified_t": "campo observado en documentos del motor"
+  },
+  "arrays_verificados": [
+    "response.product.categories_tags"
+  ],
+  "opcionales": [
+    "response.product",
+    "response.product.nova_group",
+    "response.product.categories_tags"
+  ],
+  "ejemplo_sanitizado": {
+    "requested_code": "3560070283484",
+    "source_sha256": "24fd7006bec7ae662e98251226eb42439e6c7802223600ca61ccf96263d702be",
+    "acquired_at": "2026-09-05T19:35:58.464842+00:00",
+    "found": true,
+    "response": {
+      "product": {
+        "brands": "Carrefour",
+        "categories_tags": [
+          "en:plant-based-foods-and-beverages",
+          "en:plant-based-foods",
+          "en:fruits-and-vegetables-based-foods",
+          "en:vegetable-based-foods-and-beverages",
+          "en:canned-foods",
+          "en:vegetables-based-foods",
+          "en:canned-plant-based-foods",
+          "en:vegetables",
+          "en:canned-vegetables",
+          "en:leaf-vegetables",
+          "en:spinachs",
+          "en:canned-spinachs"
+        ],
+        "code": "3560070283484",
+        "last_modified_t": 1773439699,
+        "nova_group": 3,
+        "nutriscore_grade": "a",
+        "product_name": "Épinards"
+      }
+    }
+  }
+}

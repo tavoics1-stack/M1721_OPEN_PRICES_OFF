@@ -1,0 +1,19 @@
+[
+  {
+    "keys": {
+      "requested_code": 1,
+      "source_sha256": 1
+    },
+    "unique": true
+  },
+  {
+    "keys": {
+      "response.product.brands": 1
+    }
+  },
+  {
+    "keys": {
+      "response.product.categories_tags": 1
+    }
+  }
+]

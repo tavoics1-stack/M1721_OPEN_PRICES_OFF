@@ -1,0 +1,43 @@
+name: m1721-bd
+services:
+  postgres:
+    image: postgres:17
+    container_name: m1721-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Configure .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure .env}
+      POSTGRES_DB: ${POSTGRES_DB:-m1721_004}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [local]
+  mongodb:
+    image: mongo:8
+    container_name: m1721-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?Configure .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Configure .env}
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27018}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ping:1}).ok' --username \"$$MONGO_INITDB_ROOT_USERNAME\" --password \"$$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    networks: [local]
+volumes:
+  postgres_data:
+    name: m1721_postgres_data
+  mongodb_data:
+    name: m1721_mongodb_data
+networks:
+  local:
+    driver: bridge

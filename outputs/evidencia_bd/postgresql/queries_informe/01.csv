@@ -1,0 +1,5 @@
+conname,pg_get_constraintdef
+precios_category_tag_fkey,FOREIGN KEY (category_tag) REFERENCES m1721_004.categorias(category_tag)
+precios_location_id_fkey,FOREIGN KEY (location_id) REFERENCES m1721_004.ubicaciones(location_id)
+precios_product_code_fkey,FOREIGN KEY (product_code) REFERENCES m1721_004.productos(product_code)
+precios_proof_id_fkey,FOREIGN KEY (proof_id) REFERENCES m1721_004.proofs(proof_id)

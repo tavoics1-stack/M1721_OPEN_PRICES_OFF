@@ -1,0 +1,14 @@
+{
+  "id": "M04",
+  "resultado": [
+    {
+      "requested_code": "3560070283484",
+      "found": true,
+      "response": {
+        "product": {
+          "product_name": "Épinards"
+        }
+      }
+    }
+  ]
+}

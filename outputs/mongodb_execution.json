@@ -1,0 +1,15 @@
+{
+  "status": "EJECUTADO",
+  "version": "8.0.29",
+  "checks": null,
+  "documents": 86,
+  "queries": 8,
+  "indexes": [
+    "_id_",
+    "requested_code_1_source_sha256_1",
+    "response.product.brands_1",
+    "response.product.categories_tags_1"
+  ],
+  "origen_sha256": "eb36f33bbc0886055bfd109b8ff43dee277b04f10d1d1048532882292cd5d3a6",
+  "alcance": "Evidencia histórica; ningún motor ejecutado en v1"
+}

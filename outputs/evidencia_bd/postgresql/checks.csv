@@ -1,0 +1,2 @@
+tabla,conname,definicion,convalidated
+m1721_004.precios,subject_check,CHECK ((((type = 'PRODUCT'::text) AND (product_code IS NOT NULL) AND (category_tag IS NULL)) OR ((type = 'CATEGORY'::text) AND (category_tag IS NOT NULL) AND (product_code IS NULL)))),t

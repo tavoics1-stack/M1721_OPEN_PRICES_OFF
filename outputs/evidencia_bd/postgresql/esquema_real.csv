@@ -1,0 +1,51 @@
+tabla,columna,tipo,nullable,primary_key,foreign_key,referencia,unique,constraint
+categorias,category_tag,text,NO,t,f,,t,categorias_pkey: PRIMARY KEY (category_tag)
+precios,id,bigint,NO,t,f,,t,precios_pkey: PRIMARY KEY (id)
+precios,type,text,NO,f,f,,f,subject_check: CHECK ((((type = 'PRODUCT'::text) AND (product_code IS NOT NULL) AND (category_tag IS NULL)) OR ((type = 'CATEGORY'::text) AND (category_tag IS NOT NULL) AND (product_code IS NULL))))
+precios,product_code,text,YES,f,t,FOREIGN KEY (product_code) REFERENCES m1721_004.productos(product_code),f,subject_check: CHECK ((((type = 'PRODUCT'::text) AND (product_code IS NOT NULL) AND (category_tag IS NULL)) OR ((type = 'CATEGORY'::text) AND (category_tag IS NOT NULL) AND (product_code IS NULL)))) | precios_product_code_fkey: FOREIGN KEY (product_code) REFERENCES m1721_004.productos(product_code)
+precios,category_tag,text,YES,f,t,FOREIGN KEY (category_tag) REFERENCES m1721_004.categorias(category_tag),f,subject_check: CHECK ((((type = 'PRODUCT'::text) AND (product_code IS NOT NULL) AND (category_tag IS NULL)) OR ((type = 'CATEGORY'::text) AND (category_tag IS NOT NULL) AND (product_code IS NULL)))) | precios_category_tag_fkey: FOREIGN KEY (category_tag) REFERENCES m1721_004.categorias(category_tag)
+precios,price,numeric,YES,f,f,,f,
+precios,price_per,text,YES,f,f,,f,
+precios,currency,text,YES,f,f,,f,
+precios,date,date,YES,f,f,,f,
+precios,location_id,bigint,YES,f,t,FOREIGN KEY (location_id) REFERENCES m1721_004.ubicaciones(location_id),f,precios_location_id_fkey: FOREIGN KEY (location_id) REFERENCES m1721_004.ubicaciones(location_id)
+precios,proof_id,bigint,YES,f,t,FOREIGN KEY (proof_id) REFERENCES m1721_004.proofs(proof_id),f,precios_proof_id_fkey: FOREIGN KEY (proof_id) REFERENCES m1721_004.proofs(proof_id)
+precios,qc_core_eligible,boolean,NO,f,f,,f,
+productos,product_code,text,NO,t,f,,t,productos_pkey: PRIMARY KEY (product_code)
+productos,product_name,text,YES,f,f,,f,
+productos,brands,text,YES,f,f,,f,
+productos,categories_tags,jsonb,YES,f,f,,f,
+productos,nutriscore_grade,text,YES,f,f,,f,
+productos,nova_group,text,YES,f,f,,f,
+proofs,proof_id,bigint,NO,t,f,,t,proofs_pkey: PRIMARY KEY (proof_id)
+proofs,file_path,text,YES,f,f,,f,
+proofs,mimetype,text,YES,f,f,,f,
+proofs,proof_type,text,YES,f,f,,f,
+stg_open_prices,price_id,bigint,NO,t,f,,t,stg_open_prices_pkey: PRIMARY KEY (price_id)
+stg_open_prices,price_type,text,YES,f,f,,f,
+stg_open_prices,product_code,text,YES,f,f,,f,
+stg_open_prices,category_tag,text,YES,f,f,,f,
+stg_open_prices,price,numeric,YES,f,f,,f,
+stg_open_prices,price_per,text,YES,f,f,,f,
+stg_open_prices,currency,text,YES,f,f,,f,
+stg_open_prices,date,date,YES,f,f,,f,
+stg_open_prices,location_id,bigint,YES,f,f,,f,
+stg_open_prices,proof_id,bigint,YES,f,f,,f,
+stg_open_prices,proof_type,text,YES,f,f,,f,
+stg_open_prices,proof_file_path,text,YES,f,f,,f,
+stg_open_prices,proof_mimetype,text,YES,f,f,,f,
+stg_open_prices,country,text,YES,f,f,,f,
+stg_open_prices,city,text,YES,f,f,,f,
+stg_open_prices,qc_price_positive,boolean,YES,f,f,,f,
+stg_open_prices,qc_currency_present,boolean,YES,f,f,,f,
+stg_open_prices,qc_date_present,boolean,YES,f,f,,f,
+stg_open_prices,qc_date_not_future,boolean,YES,f,f,,f,
+stg_open_prices,qc_date_valid,boolean,YES,f,f,,f,
+stg_open_prices,qc_proof_present,boolean,YES,f,f,,f,
+stg_open_prices,qc_proof_visual,boolean,YES,f,f,,f,
+stg_open_prices,qc_product_identity,boolean,YES,f,f,,f,
+stg_open_prices,qc_core_eligible,boolean,YES,f,f,,f,
+stg_open_prices,source_snapshot,text,YES,f,f,,f,
+ubicaciones,location_id,bigint,NO,t,f,,t,ubicaciones_pkey: PRIMARY KEY (location_id)
+ubicaciones,country,text,YES,f,f,,f,
+ubicaciones,city,text,YES,f,f,,f,

@@ -1,0 +1,45 @@
+{
+  "id": "M05",
+  "resultado": [
+    {
+      "requested_code": "00204682",
+      "response": {
+        "product": {
+          "nova_group": "3.0"
+        }
+      }
+    },
+    {
+      "requested_code": "0021130306022",
+      "response": {
+        "product": {
+          "nova_group": "4.0"
+        }
+      }
+    },
+    {
+      "requested_code": "0021130494859",
+      "response": {
+        "product": {
+          "nova_group": "3.0"
+        }
+      }
+    },
+    {
+      "requested_code": "0021500042178",
+      "response": {
+        "product": {
+          "nova_group": "4.0"
+        }
+      }
+    },
+    {
+      "requested_code": "0034500420686",
+      "response": {
+        "product": {
+          "nova_group": "4.0"
+        }
+      }
+    }
+  ]
+}

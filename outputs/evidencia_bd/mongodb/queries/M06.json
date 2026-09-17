@@ -1,0 +1,32 @@
+{
+  "id": "M06",
+  "resultado": [
+    {
+      "requested_code": "00204682",
+      "response": {
+        "product": {
+          "categories_tags": [
+            "en:snacks",
+            "en:sweet-snacks",
+            "en:cocoa-and-its-products",
+            "en:chocolates",
+            "en:milk-chocolates",
+            "en:milk-chocolate-bar"
+          ]
+        }
+      }
+    },
+    {
+      "requested_code": "0021130306022",
+      "response": {
+        "product": {
+          "categories_tags": [
+            "en:snacks",
+            "en:sweet-snacks",
+            "en:biscuits-and-cakes"
+          ]
+        }
+      }
+    }
+  ]
+}

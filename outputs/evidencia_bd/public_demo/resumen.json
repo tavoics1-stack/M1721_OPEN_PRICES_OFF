@@ -1,0 +1,26 @@
+{
+  "modo": "PUBLIC_DEMO",
+  "database": "m1721_public_demo",
+  "schema": "m1721_004",
+  "collection": "off_product_snapshots",
+  "conteos_pg": {
+    "stg_open_prices": 485,
+    "productos": 79,
+    "categorias": 0,
+    "precios": 485,
+    "ubicaciones": 148,
+    "proofs": 404
+  },
+  "mongodb": {
+    "documentos": 79,
+    "encontrados": 79,
+    "no_encontrados": 0,
+    "indices": 4
+  },
+  "version_postgres": "PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "version_mongodb": "8.3.9",
+  "sql_ejecutadas": 12,
+  "mongo_ejecutadas": 8,
+  "fecha_utc": "2026-09-10T13:31:41.440299+00:00",
+  "estado": "PASS"
+}

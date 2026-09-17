@@ -1,0 +1,10 @@
+tablename,indexname,indexdef
+categorias,categorias_pkey,CREATE UNIQUE INDEX categorias_pkey ON m1721_004.categorias USING btree (category_tag)
+precios,precios_pkey,CREATE UNIQUE INDEX precios_pkey ON m1721_004.precios USING btree (id)
+precios,prices_location,CREATE INDEX prices_location ON m1721_004.precios USING btree (location_id)
+precios,prices_proof,CREATE INDEX prices_proof ON m1721_004.precios USING btree (proof_id)
+precios,prices_subject_currency,"CREATE INDEX prices_subject_currency ON m1721_004.precios USING btree (product_code, currency, date)"
+productos,productos_pkey,CREATE UNIQUE INDEX productos_pkey ON m1721_004.productos USING btree (product_code)
+proofs,proofs_pkey,CREATE UNIQUE INDEX proofs_pkey ON m1721_004.proofs USING btree (proof_id)
+stg_open_prices,stg_open_prices_pkey,CREATE UNIQUE INDEX stg_open_prices_pkey ON m1721_004.stg_open_prices USING btree (price_id)
+ubicaciones,ubicaciones_pkey,CREATE UNIQUE INDEX ubicaciones_pkey ON m1721_004.ubicaciones USING btree (location_id)

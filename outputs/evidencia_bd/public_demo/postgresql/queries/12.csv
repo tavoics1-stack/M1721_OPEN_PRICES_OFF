@@ -1,0 +1,11 @@
+price_id,type,product_code,price,currency,country,city,proof_id,product_name,total_vista
+355,PRODUCT,3423182102411,4.150,EUR,France,Grenoble,9880,pur jus pomme framboise bio,485
+655,PRODUCT,3760020507916,3.070,EUR,France,Grenoble,9880,Gaufrettes chocolat,485
+999,PRODUCT,3443431503004,6.350,EUR,France,Paris,1,Poudre de cacao maigre biologique,485
+1000,PRODUCT,3456300014556,2.850,EUR,France,Grenoble,2,Fourrés Chocolat🍫,485
+1001,PRODUCT,3760020507916,3.160,EUR,France,Grenoble,3,Gaufrettes chocolat,485
+1096,PRODUCT,3456300014556,2.620,EUR,France,Grenoble,83,Fourrés Chocolat🍫,485
+1108,PRODUCT,3456300014556,2.850,EUR,France,Grenoble,95,Fourrés Chocolat🍫,485
+1109,PRODUCT,3760020507916,3.160,EUR,France,Grenoble,96,Gaufrettes chocolat,485
+1124,PRODUCT,3760020507916,3.150,EUR,France,Échirolles,112,Gaufrettes chocolat,485
+1125,PRODUCT,3456300014556,2.990,EUR,France,Échirolles,113,Fourrés Chocolat🍫,485

@@ -1,0 +1,11 @@
+price_id,location_id,country,city,price,currency
+1,1,France,Grenoble,27.700,EUR
+2,1,France,Grenoble,27.700,EUR
+3,1,France,Grenoble,26.380,EUR
+4,1,France,Grenoble,39.570,EUR
+5,1,France,Grenoble,59.360,EUR
+6,1,France,Grenoble,46.170,EUR
+7,1,France,Grenoble,11.870,EUR
+8,1,France,Grenoble,9.890,EUR
+9,1,France,Grenoble,7.650,EUR
+10,1,France,Grenoble,3.300,EUR

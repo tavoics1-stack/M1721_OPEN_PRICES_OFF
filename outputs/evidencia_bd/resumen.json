@@ -1,0 +1,26 @@
+{
+  "modo": "LOCAL_FULL",
+  "database": "m1721_004",
+  "schema": "m1721_004",
+  "collection": "off_product_snapshots",
+  "conteos_pg": {
+    "categorias": 593,
+    "ubicaciones": 6608,
+    "productos": 135700,
+    "proofs": 113917,
+    "precios": 307183,
+    "stg_open_prices": 307183
+  },
+  "mongodb": {
+    "documentos": 86,
+    "encontrados": 79,
+    "no_encontrados": 7,
+    "indices": 4
+  },
+  "version_postgres": "PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "version_mongodb": "8.3.9",
+  "sql_ejecutadas": 12,
+  "mongo_ejecutadas": 8,
+  "fecha_utc": "2026-09-10T13:25:47.235009+00:00",
+  "estado": "PASS"
+}

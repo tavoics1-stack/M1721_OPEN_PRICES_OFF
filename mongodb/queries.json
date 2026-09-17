@@ -1,0 +1,39 @@
+[
+  {
+    "requested_code": "3560070283484"
+  },
+  {
+    "response.product.brands": {
+      "$regex": "Carrefour",
+      "$options": "i"
+    }
+  },
+  {
+    "response.product.categories_tags.0": {
+      "$exists": true
+    }
+  },
+  {
+    "response.product.ingredients.0": {
+      "$exists": true
+    }
+  },
+  {
+    "response.product.nutrition": {
+      "$type": "object"
+    }
+  },
+  {
+    "response.product.nova_group": {
+      "$exists": true
+    }
+  },
+  {
+    "response.product.images": {
+      "$type": "object"
+    }
+  },
+  {
+    "found": false
+  }
+]
