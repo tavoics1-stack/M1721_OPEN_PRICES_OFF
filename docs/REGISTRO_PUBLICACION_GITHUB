@@ -1,0 +1,40 @@
+# Registro de publicación del proyecto en GitHub
+
+## Proyecto
+
+Integración de Open Prices y Open Food Facts para la preparación de datos orientada a la predicción de precios.
+
+## Responsable de la publicación
+
+Usuario de GitHub: tavoics1-stack
+
+## Actividades realizadas
+
+Preparé una copia independiente del paquete GitHub-ready del proyecto final para trabajar con Git sin modificar la versión original.
+
+Revisé la lista de archivos que se incorporarían al repositorio y comprobé las exclusiones configuradas en `.gitignore`. Después inicialicé Git, configuré mi identidad de autor y registré el primer commit con los 144 archivos del paquete.
+
+Creé el repositorio privado M1721_OPEN_PRICES_OFF en GitHub, lo conecté con el repositorio local y publiqué la rama principal `main`.
+
+Invité a los otros tres integrantes del equipo y comprobé que aceptaron el acceso. También creé y publiqué una rama de trabajo para cada integrante:
+
+- feature/tavoics1-stack
+- feature/carlosqnk
+- feature/williamat
+- feature/wilsonandressani-cyber
+
+## Estado de la colaboración
+
+Las cuatro ramas están disponibles en GitHub. Cada integrante deberá registrar sus propias contribuciones y commits desde su cuenta.
+
+Este registro documenta las actividades de preparación y publicación realizadas hasta el momento; no acredita contribuciones que los demás integrantes todavía no hayan efectuado.
+
+## Alcance
+
+La publicación utiliza el paquete GitHub-ready de la V1. No incorpora la ampliación experimental de embeddings visuales ni modifica los datasets finales validados.
+
+Los manifiestos de empaquetado conservan su alcance original; este registro es un documento adicional de la práctica de Git.
+
+## Repositorio
+
+https://github.com/tavoics1-stack/M1721_OPEN_PRICES_OFF
