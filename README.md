@@ -99,3 +99,13 @@ El ERD y los modelos están en `docs/diagramas`. Las consultas de lectura están
 LOCAL_FULL utiliza los originales privados del maestro. PUBLIC_DEMO utiliza únicamente las proyecciones incluidas, en la base separada m1721_public_demo: 485 precios, 79 productos y 79 fichas proyectadas. No reproduce los 307.183 precios ni las 86 respuestas completas. Siga README_DOCKER.md para configurar un .env local que nunca debe publicarse. No se distribuyen imágenes privadas, JSON completos, secretos ni volúmenes.
 
 Las evidencias v1 anteriores permanecen como registros históricos de su ejecución. El README se amplió en este empaquetado; por eso MANIFEST_V1.csv y SHA256SUMS.txt describen la versión previa, no toda esta ampliación. Los controles vigentes del paquete son MANIFEST_EMPAQUETADO.csv y SHA256SUMS_EMPAQUETADO.txt. El mecanismo reproducir.bat y los hashes canónicos no cambian.
+
+
+---
+
+## Contribución — Wilson Andrés Sani
+
+**Rama:** `feature/wilsonandressani-cyber`
+
+En el proyecto de integración de datos de Open Prices y Open Food Facts para la preparación de un dataset orientado a la futura predicción de precios de productos alimenticios. Esta contribución documenta la revisión del flujo de trabajo con Git y GitHub (ramas, commits y sincronización) aplicado sobre el repositorio compartido del equipo, verificando la estructura del dataset final (precios_productos_predictive_preparation_v1) y la organización de las carpetas del proyecto (data, docs, notebooks, sql, mongodb, infra/docker).
+*Wilson Andrés Sani*
