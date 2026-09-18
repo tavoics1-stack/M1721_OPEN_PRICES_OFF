@@ -79,7 +79,7 @@ El pipeline comprueba hashes de las tres proyecciones, vuelve a integrar, deriva
 
 El nuevo Notebook puede ejecutarse desde esta carpeta o desde `notebooks/`. Explica y comprueba v1 con los insumos redistribuidos y presenta SQL/MongoDB como evidencia histórica, no como consultas en vivo. El Notebook Maestro anterior permanece intacto en el archivo privado; su comprobación original de 259 fuentes no puede repetirse desde esta copia.
 
-La reproducción pública **solo reconstruye v1 desde las proyecciones incluidas**. No reproduce la adquisición, la selección desde el core completo, las cuatro salidas históricas ni los originales excluidos. Esas operaciones se verificaron en el entorno privado autorizado. Una nueva descarga oficial podría contener otros datos y no recuperar los hashes históricos. Los hashes y URLs del manifiesto permiten identificar los insumos exactos necesarios para una reproducción privada completa.
+La reproducción pública **solo reconstruye v1 desde las proyecciones incluidas**. No reproduce la adquisición, la selección desde el core completo, las cuatro salidas históricas ni los originales excluidos. Esas operaciones se verificaron en el entorno privado autorizado. Una nueva descarga oficial podría contener otros datos y no recuperar los hashes históricos. Los hashes y URLs del manifiesto permiten identificar los insumos exactos necesarios para una reproducción privada completa y bien estructurada.
 
 ## Privacidad, licencias y publicación
 
