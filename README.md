@@ -27,6 +27,8 @@ Este proyecto construye y documenta el conjunto de datos necesario para una futu
 
 El resultado actual materializa una estructura de preparación, no demuestra que su tamaño, cobertura o comparabilidad sean suficientes para una modelización seria. No se entrenaron modelos, dividieron datos, evaluaron algoritmos, aplicaron OCR ni convirtieron monedas. Tampoco se estudian inflación, causalidad ni forecasting.
 
+**Nota de revisión (Wilson Sani):** el objetivo y alcance del proyecto fueron revisados y confirmados como consistentes con la estructura de carpetas entregada.
+
 ## Resultado final del proyecto
 
 Se construyó `precios_productos_predictive_preparation_v1`, con **485 observaciones y 38 variables**, en CSV y Parquet dentro de `data/processed/`. Son dos formatos del mismo conjunto. La unidad es una observación de precio identificada por `price_id`; los 485 identificadores son únicos.
