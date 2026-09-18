@@ -1,3 +1,6 @@
+# Objetivo Proyecto
+El presente proyecto pretende consolidar infrmación de Food Facts.
+
 # Dataset integrado de precios y productos para preparación predictiva
 
 ## Contexto documental actualizado al 2026-09-12
